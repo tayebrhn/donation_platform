@@ -1,0 +1,28 @@
+<% content_for :title, "Donation status | Common Ground" %>
+
+<main id="main-content" class="site-shell result-page">
+  <section class="result-panel" aria-labelledby="result-title">
+    <% if @donation.status == "succeeded" %>
+      <div class="result-mark result-mark--success" aria-hidden="true">OK</div>
+      <div class="eyebrow eyebrow--quiet">Donation confirmed</div>
+      <h1 id="result-title">Thank you for helping this project move forward.</h1>
+      <p>Stripe has confirmed your <%= format_money(@donation.amount_cents, currency: @donation.currency) %> donation.</p>
+    <% elsif @donation.status == "failed" %>
+      <div class="result-mark result-mark--failed" aria-hidden="true">!</div>
+      <div class="eyebrow eyebrow--quiet">Payment not completed</div>
+      <h1 id="result-title">Your donation was not charged.</h1>
+      <p>Stripe could not complete this payment. You can return to the project and try again.</p>
+    <% else %>
+      <div class="result-mark" aria-hidden="true">...</div>
+      <div class="eyebrow eyebrow--quiet">Verification in progress</div>
+      <h1 id="result-title">Your payment is being verified.</h1>
+      <p>Your donation remains pending until Common Ground receives Stripe's signed confirmation.</p>
+    <% end %>
+
+    <div class="result-details">
+      <span><%= @project.title %></span>
+      <strong><%= format_money(@donation.amount_cents, currency: @donation.currency) %></strong>
+    </div>
+    <%= link_to "Return to project", project_path(@project), class: "button button--primary" %>
+  </section>
+</main>

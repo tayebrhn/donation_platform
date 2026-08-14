@@ -1,0 +1,57 @@
+<% content_for :title, "Complete your donation | Common Ground" %>
+<% content_for :head do %>
+  <script src="https://js.stripe.com/v3/" defer></script>
+<% end %>
+
+<main id="main-content" class="site-shell">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <%= link_to "Projects", projects_path %>
+    <span aria-hidden="true">/</span>
+    <%= link_to @project.title, project_path(@project) %>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Payment</span>
+  </nav>
+
+  <section class="checkout-layout"
+           aria-labelledby="checkout-title"
+           data-controller="stripe-payment"
+           data-stripe-payment-publishable-key-value="<%= @publishable_key %>"
+           data-stripe-payment-client-secret-value="<%= @client_secret %>"
+           data-stripe-payment-return-url-value="<%= @result_url %>">
+    <div class="checkout-intro">
+      <div class="eyebrow"><span class="eyebrow__line"></span> Secure test payment</div>
+      <h1 id="checkout-title">Complete your <%= format_money(@donation.amount_cents, currency: @donation.currency) %> donation.</h1>
+      <p>Your donation remains pending until Stripe confirms the payment to Common Ground's server.</p>
+
+      <dl class="checkout-summary">
+        <div>
+          <dt>Project</dt>
+          <dd><%= @project.title %></dd>
+        </div>
+        <div>
+          <dt>Donation</dt>
+          <dd><%= format_money(@donation.amount_cents, currency: @donation.currency) %> <%= @donation.currency %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="payment-panel">
+      <div class="payment-panel__heading">
+        <span class="eyebrow eyebrow--quiet">Payment details</span>
+        <span class="test-mode-label">Test mode</span>
+      </div>
+
+      <form class="payment-form" data-action="submit->stripe-payment#submit">
+        <div class="payment-element" data-stripe-payment-target="paymentElement">
+          <span class="payment-loading">Loading secure payment fields...</span>
+        </div>
+        <p class="payment-message" role="alert" hidden data-stripe-payment-target="message"></p>
+        <button class="button button--primary button--full" type="submit" disabled data-stripe-payment-target="submit">
+          Pay <%= format_money(@donation.amount_cents, currency: @donation.currency) %>
+        </button>
+      </form>
+
+      <p class="payment-security-note">Card information goes directly to Stripe and is never stored by Common Ground.</p>
+    </div>
+  </section>
+</main>

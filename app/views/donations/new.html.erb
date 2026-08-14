@@ -17,11 +17,18 @@
     </div>
 
     <div class="donation-form__card">
-      <%= form_with scope: :donation,
-                    url: new_project_donation_path(@project),
-                    method: :get,
-                    local: true,
-                    class: "donation-form" do |form| %>
+      <% if @donation.errors.any? %>
+        <div class="form-errors" role="alert">
+          <strong>We could not prepare your donation.</strong>
+          <ul>
+            <% @donation.errors.full_messages.each do |message| %>
+              <li><%= message.sub("Amount cents", "Amount") %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: [ @project, @donation ], local: true, class: "donation-form" do |form| %>
         <div class="form-field">
           <%= form.label :donor_name, "Your name" %>
           <%= form.text_field :donor_name, autocomplete: "name", required: true, placeholder: "Alex Morgan" %>
@@ -33,18 +40,18 @@
         </div>
 
         <div class="form-field">
-          <%= form.label :amount, "Gift amount (#{@project.currency})" %>
+          <%= label_tag :donation_amount, "Gift amount (#{@project.currency})" %>
           <div class="amount-input">
             <span aria-hidden="true"><%= @project.currency == "USD" ? "$" : @project.currency %></span>
-            <%= number_field_tag "donation[amount]", nil, min: 1, max: 10_000, step: 0.01, required: true, placeholder: "25.00", inputmode: "decimal", aria: { describedby: "amount-note" } %>
+            <%= number_field_tag "donation[amount]", @amount, min: 1, max: 10_000, step: 0.01, required: true, placeholder: "25.00", inputmode: "decimal", aria: { describedby: "amount-note" } %>
           </div>
           <span id="amount-note" class="form-hint">Choose any amount from 1 to 10,000.</span>
         </div>
 
-        <button class="button button--primary button--full" type="submit" disabled>
+        <button class="button button--primary button--full" type="submit">
           Continue to payment <span aria-hidden="true">-&gt;</span>
         </button>
-        <p class="form-note">Secure checkout is being prepared for this campaign.</p>
+        <p class="form-note">Your card details are collected securely by Stripe on the next step.</p>
       <% end %>
     </div>
   </section>

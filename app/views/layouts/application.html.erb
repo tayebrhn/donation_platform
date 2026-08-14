@@ -34,6 +34,10 @@
       </div>
     </header>
 
+    <% flash.each do |type, message| %>
+      <div class="flash-message flash-message--<%= type %>" role="status"><%= message %></div>
+    <% end %>
+
     <%= yield %>
 
     <footer class="site-footer">

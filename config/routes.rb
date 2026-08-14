@@ -2,7 +2,14 @@ Rails.application.routes.draw do
   root "projects#index"
 
   resources :projects, only: [ :index, :show ] do
-    resources :donations, only: [ :new ]
+    resources :donations, only: [ :new, :create ]
+  end
+
+  resources :donations, only: [] do
+    member do
+      get :checkout
+      get :result
+    end
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
