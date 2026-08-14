@@ -19,9 +19,10 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
-  username: postgres
-  password: qwertyuiop
-  host: localhost
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  port: <%= ENV.fetch("POSTGRES_PORT", 5432) %>
 
 
 development:
