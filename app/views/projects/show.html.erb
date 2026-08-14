@@ -1,0 +1,40 @@
+<% content_for :title, "#{@project.title} | Common Ground" %>
+
+<main id="main-content" class="site-shell">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <%= link_to "Projects", projects_path %>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page"><%= @project.title %></span>
+  </nav>
+
+  <section class="campaign-hero" aria-labelledby="campaign-title">
+    <div class="campaign-hero__copy">
+      <div class="eyebrow"><span class="eyebrow__line"></span> Active campaign</div>
+      <h1 id="campaign-title"><%= @project.title %></h1>
+      <p class="campaign-hero__description"><%= @project.description %></p>
+    </div>
+    <div class="campaign-hero__aside">
+      <span class="status-label status-label--large"><span class="status-dot"></span> Fundraising now</span>
+      <span class="campaign-hero__aside-note">Every contribution moves this work forward.</span>
+    </div>
+  </section>
+
+  <section class="campaign-layout" aria-label="Campaign details">
+    <article class="story-panel">
+      <div class="eyebrow eyebrow--quiet">The work</div>
+      <h2>A practical goal with a lasting reach.</h2>
+      <p><%= @project.description %></p>
+      <div class="story-panel__rule"></div>
+      <p class="story-panel__note">Your gift is recorded in <strong><%= @project.currency %></strong> and directed to this campaign.</p>
+    </article>
+
+    <aside id="fundraising-progress" class="progress-panel" aria-labelledby="progress-title">
+      <div class="eyebrow eyebrow--quiet">Fundraising progress</div>
+      <h2 id="progress-title"><%= format_money(@project.goal_amount_cents, currency: @project.currency) %> goal</h2>
+      <%= render "progress", project: @project %>
+      <%= link_to new_project_donation_path(@project), class: "button button--primary" do %>
+        Donate to this project <span aria-hidden="true">-&gt;</span>
+      <% end %>
+    </aside>
+  </section>
+</main>

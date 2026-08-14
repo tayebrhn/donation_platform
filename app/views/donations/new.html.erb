@@ -1,0 +1,59 @@
+<% content_for :title, "Donate to #{@project.title} | Common Ground" %>
+
+<main id="main-content" class="site-shell">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <%= link_to "Projects", projects_path %>
+    <span aria-hidden="true">/</span>
+    <%= link_to @project.title, project_path(@project) %>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Donate</span>
+  </nav>
+
+  <section class="donation-layout" aria-labelledby="donation-title">
+    <div class="donation-form__intro">
+      <div class="eyebrow"><span class="eyebrow__line"></span> Make a contribution</div>
+      <h1 id="donation-title">Put your support behind <em><%= @project.title %></em>.</h1>
+      <p>Your details help us keep a clear record of every contribution. Payment checkout will open once your gift is ready.</p>
+    </div>
+
+    <div class="donation-form__card">
+      <%= form_with scope: :donation,
+                    url: new_project_donation_path(@project),
+                    method: :get,
+                    local: true,
+                    class: "donation-form" do |form| %>
+        <div class="form-field">
+          <%= form.label :donor_name, "Your name" %>
+          <%= form.text_field :donor_name, autocomplete: "name", required: true, placeholder: "Alex Morgan" %>
+        </div>
+
+        <div class="form-field">
+          <%= form.label :donor_email, "Email address" %>
+          <%= form.email_field :donor_email, autocomplete: "email", required: true, placeholder: "alex@example.com" %>
+        </div>
+
+        <div class="form-field">
+          <%= form.label :amount, "Gift amount (#{@project.currency})" %>
+          <div class="amount-input">
+            <span aria-hidden="true"><%= @project.currency == "USD" ? "$" : @project.currency %></span>
+            <%= number_field_tag "donation[amount]", nil, min: 1, max: 10_000, step: 0.01, required: true, placeholder: "25.00", inputmode: "decimal", aria: { describedby: "amount-note" } %>
+          </div>
+          <span id="amount-note" class="form-hint">Choose any amount from 1 to 10,000.</span>
+        </div>
+
+        <button class="button button--primary button--full" type="submit" disabled>
+          Continue to payment <span aria-hidden="true">-&gt;</span>
+        </button>
+        <p class="form-note">Secure checkout is being prepared for this campaign.</p>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="donation-context" aria-label="Campaign summary">
+    <div>
+      <span class="eyebrow eyebrow--quiet">You are supporting</span>
+      <h2><%= @project.title %></h2>
+    </div>
+    <%= render "projects/progress", project: @project %>
+  </section>
+</main>

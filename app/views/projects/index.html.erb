@@ -1,0 +1,53 @@
+<% content_for :title, "Projects | Common Ground" %>
+
+<main id="main-content" class="site-shell">
+  <section class="page-intro" aria-labelledby="page-title">
+    <div class="eyebrow"><span class="eyebrow__line"></span> Community-funded change</div>
+    <div class="page-intro__grid">
+      <div>
+        <h1 id="page-title">Good work deserves a crowd.</h1>
+        <p class="page-intro__lead">Back the classrooms, neighborhoods, and people making tomorrow more generous.</p>
+      </div>
+      <div class="intro-stat" aria-label="Active project count">
+        <strong><%= @projects.size %></strong>
+        <span>active<br>campaigns</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="project-section" aria-labelledby="active-projects-title">
+    <div class="section-heading">
+      <div>
+        <div class="eyebrow eyebrow--quiet">Open for support</div>
+        <h2 id="active-projects-title">Projects in motion</h2>
+      </div>
+      <span class="section-heading__count"><%= @projects.size %> available</span>
+    </div>
+
+    <% if @projects.any? %>
+      <div class="project-grid">
+        <% @projects.each_with_index do |project, index| %>
+          <article class="project-card">
+            <div class="project-card__topline">
+              <span class="status-label"><span class="status-dot"></span> Active</span>
+              <span class="project-card__index"><%= format("%02d", index + 1) %></span>
+            </div>
+            <h3><%= project.title %></h3>
+            <p class="project-card__description"><%= truncate(project.description, length: 150) %></p>
+
+            <%= render "progress", project: project %>
+
+            <%= link_to project_path(project), class: "text-link" do %>
+              View campaign <span aria-hidden="true">-&gt;</span>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <h3>New campaigns are taking shape.</h3>
+        <p>Check back soon to find a project ready for support.</p>
+      </div>
+    <% end %>
+  </section>
+</main>
