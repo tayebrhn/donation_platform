@@ -1,0 +1,13 @@
+school_library:
+  title: Build a School Library
+  description: Help provide books and a safe reading space for local students.
+  goal_amount_cents: 1000000
+  currency: USD
+  status: active
+
+community_garden:
+  title: Create a Community Garden
+  description: Turn an unused schoolyard into a garden and outdoor classroom.
+  goal_amount_cents: 500000
+  currency: USD
+  status: draft

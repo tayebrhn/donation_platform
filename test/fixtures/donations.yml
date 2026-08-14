@@ -1,0 +1,35 @@
+library_first:
+  project: school_library
+  donor_name: Avery Stone
+  donor_email: avery@example.com
+  amount_cents: 250000
+  currency: USD
+  stripe_payment_intent_id: pi_library_first
+  status: succeeded
+
+library_second:
+  project: school_library
+  donor_name: Morgan Lee
+  donor_email: morgan@example.com
+  amount_cents: 175000
+  currency: USD
+  stripe_payment_intent_id: pi_library_second
+  status: succeeded
+
+library_pending:
+  project: school_library
+  donor_name: Jordan Reyes
+  donor_email: jordan@example.com
+  amount_cents: 50000
+  currency: USD
+  stripe_payment_intent_id: pi_library_pending
+  status: pending
+
+library_failed:
+  project: school_library
+  donor_name: Riley Patel
+  donor_email: riley@example.com
+  amount_cents: 10000
+  currency: USD
+  stripe_payment_intent_id: pi_library_failed
+  status: failed
