@@ -802,6 +802,14 @@ h1 {
   text-align: center;
 }
 
+.checkout-cancel {
+  display: block;
+  margin-top: 1rem;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 .result-page {
   display: grid;
   min-height: calc(100vh - 167px);

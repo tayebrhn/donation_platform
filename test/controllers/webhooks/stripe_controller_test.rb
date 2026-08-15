@@ -35,6 +35,15 @@ module Webhooks
       assert_equal "failed", @donation.reload.status
     end
 
+    test "marks a donation failed after a valid canceled event" do
+      payload = event_payload(event_id: "evt_payment_canceled", type: "payment_intent.canceled")
+
+      post_webhook(payload)
+
+      assert_response :ok
+      assert_equal "failed", @donation.reload.status
+    end
+
     test "rejects an invalid signature" do
       payload = event_payload(event_id: "evt_invalid_signature", type: "payment_intent.succeeded")
 

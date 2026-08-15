@@ -29,4 +29,10 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "returns not found for a missing project" do
+    get project_url(id: 0)
+
+    assert_response :not_found
+  end
 end

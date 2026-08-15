@@ -166,6 +166,7 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-stripe-payment-publishable-key-value='pk_test_example']"
     assert_select "[data-stripe-payment-client-secret-value='pi_secret_test']"
     assert_select ".test-mode-label", text: "Test mode"
+    assert_select "a[href=?]", project_path(@project), text: "Cancel and return to project"
     payment_intents.verify
   end
 
@@ -190,6 +191,53 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Secure checkout is temporarily unavailable. Please try again.", flash[:alert]
   end
 
+  test "does not reopen a terminal donation in checkout" do
+    donation = donations(:library_failed)
+
+    get checkout_donation_url(donation.signed_id(purpose: :checkout, expires_in: 30.minutes))
+
+    assert_response :redirect
+    signed_id = URI.parse(response.location).path.delete_prefix("/donations/").delete_suffix("/result")
+    assert_equal donation, Donation.find_signed(signed_id, purpose: :result)
+  end
+
+  test "does not present a canceled PaymentIntent for checkout" do
+    donation = donations(:library_pending)
+    payment_intents = Minitest::Mock.new
+    payment_intents.expect(
+      :retrieve,
+      stripe_payment_intent(
+        id: donation.stripe_payment_intent_id,
+        donation_id: donation.id,
+        amount: donation.amount_cents,
+        status: "canceled"
+      ),
+      [ donation.stripe_payment_intent_id ]
+    )
+
+    with_stripe_payment_intents(payment_intents) do
+      get checkout_donation_url(donation.signed_id(purpose: :checkout, expires_in: 30.minutes))
+    end
+
+    assert_redirected_to project_path(@project)
+    assert_equal "This payment can no longer be completed. Please start a new donation.", flash[:alert]
+    payment_intents.verify
+  end
+
+  test "handles a Stripe retrieval failure during checkout" do
+    donation = donations(:library_pending)
+    payment_intents = Minitest::Mock.new
+    payment_intents.expect(:retrieve, nil) { raise Stripe::APIConnectionError, "Stripe unavailable" }
+
+    with_stripe_payment_intents(payment_intents) do
+      get checkout_donation_url(donation.signed_id(purpose: :checkout, expires_in: 30.minutes))
+    end
+
+    assert_redirected_to project_path(@project)
+    assert_equal "Secure checkout is temporarily unavailable. Please try again.", flash[:alert]
+    payment_intents.verify
+  end
+
   test "checkout and result reject unsigned donation IDs" do
     get checkout_donation_url(donations(:library_pending).id)
     assert_response :not_found
@@ -209,6 +257,16 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "pending", donation.reload.status
   end
 
+  test "result explains a failed payment without changing its status" do
+    donation = donations(:library_failed)
+
+    get result_donation_url(donation.signed_id(purpose: :result, expires_in: 2.days))
+
+    assert_response :success
+    assert_select "h1", text: "Your donation was not charged."
+    assert_equal "failed", donation.reload.status
+  end
+
   private
 
   def valid_donation_params(overrides = {})
@@ -221,11 +279,12 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     }
   end
 
-  def stripe_payment_intent(id:, donation_id:, amount: 2_500, livemode: false)
+  def stripe_payment_intent(id:, donation_id:, amount: 2_500, livemode: false, status: nil)
     Stripe::PaymentIntent.construct_from(
       id: id,
       client_secret: "pi_secret_test",
       livemode: livemode,
+      status: status,
       amount: amount,
       currency: "usd",
       metadata: { donation_id: donation_id&.to_s }

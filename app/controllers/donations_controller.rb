@@ -28,8 +28,11 @@ class DonationsController < ApplicationController
   def checkout
     @donation = find_signed_donation!(:checkout)
     @project = @donation.project
+    return redirect_to_result unless @donation.status == "pending"
+
     payment_intent = stripe_client.v1.payment_intents.retrieve(@donation.stripe_payment_intent_id)
     verify_payment_intent!(payment_intent)
+    return redirect_to_project("This payment can no longer be completed. Please start a new donation.") if payment_intent.status == "canceled"
 
     @client_secret = payment_intent.client_secret
     @publishable_key = stripe_publishable_key
@@ -131,5 +134,13 @@ class DonationsController < ApplicationController
     @donation ||= @project.donations.build(currency: @project.currency, status: "pending")
     @donation.errors.add(:base, message)
     render :new, status: status
+  end
+
+  def redirect_to_result
+    redirect_to result_donation_path(@donation.signed_id(purpose: :result, expires_in: 2.days))
+  end
+
+  def redirect_to_project(message)
+    redirect_to project_path(@project), alert: message
   end
 end

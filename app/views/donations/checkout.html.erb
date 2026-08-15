@@ -52,6 +52,7 @@
       </form>
 
       <p class="payment-security-note">Card information goes directly to Stripe and is never stored by Common Ground.</p>
+      <%= link_to "Cancel and return to project", project_path(@project), class: "checkout-cancel" %>
     </div>
   </section>
 </main>

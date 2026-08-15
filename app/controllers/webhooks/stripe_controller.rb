@@ -7,7 +7,8 @@ module Webhooks
 
     PAYMENT_INTENT_EVENTS = {
       "payment_intent.succeeded" => "succeeded",
-      "payment_intent.payment_failed" => "failed"
+      "payment_intent.payment_failed" => "failed",
+      "payment_intent.canceled" => "failed"
     }.freeze
 
     def create
