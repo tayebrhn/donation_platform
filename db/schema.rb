@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_14_000002) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_14_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -28,7 +28,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_14_000002) do
     t.index ["stripe_payment_intent_id"], name: "index_donations_on_stripe_payment_intent_id", unique: true, where: "(stripe_payment_intent_id IS NOT NULL)"
     t.check_constraint "amount_cents >= 100 AND amount_cents <= 1000000", name: "donations_amount_allowed"
     t.check_constraint "currency::text ~ '^[A-Z]{3}$'::text", name: "donations_currency_format"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'succeeded'::character varying, 'failed'::character varying]::text[])", name: "donations_status_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'succeeded'::character varying::text, 'failed'::character varying::text])", name: "donations_status_allowed"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -42,7 +42,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_14_000002) do
     t.index ["status"], name: "index_projects_on_status"
     t.check_constraint "currency::text ~ '^[A-Z]{3}$'::text", name: "projects_currency_format"
     t.check_constraint "goal_amount_cents > 0", name: "projects_goal_amount_positive"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'active'::character varying, 'completed'::character varying]::text[])", name: "projects_status_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'active'::character varying::text, 'completed'::character varying::text])", name: "projects_status_allowed"
+  end
+
+  create_table "stripe_webhook_events", force: :cascade do |t|
+    t.string "stripe_event_id", null: false
+    t.string "event_type", null: false
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_type"], name: "index_stripe_webhook_events_on_event_type"
+    t.index ["stripe_event_id"], name: "index_stripe_webhook_events_on_stripe_event_id", unique: true
   end
 
   add_foreign_key "donations", "projects"
