@@ -48,6 +48,14 @@ class DonationTest < ActiveSupport::TestCase
     assert_predicate @donation, :invalid?
   end
 
+  test "accepts amounts at the allowed boundaries" do
+    @donation.amount_cents = Donation::MINIMUM_AMOUNT_CENTS
+    assert_predicate @donation, :valid?
+
+    @donation.amount_cents = Donation::MAXIMUM_AMOUNT_CENTS
+    assert_predicate @donation, :valid?
+  end
+
   test "requires a supported status" do
     @donation.status = "refunded"
 

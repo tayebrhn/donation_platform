@@ -64,6 +64,15 @@ module Webhooks
       assert_equal "pending", @donation.reload.status
     end
 
+    test "rejects a signed malformed JSON payload" do
+      payload = "{not-json"
+
+      assert_no_difference("StripeWebhookEvent.count") { post_webhook(payload) }
+
+      assert_response :bad_request
+      assert_equal "pending", @donation.reload.status
+    end
+
     test "processes duplicate event deliveries only once" do
       payload = event_payload(event_id: "evt_duplicate", type: "payment_intent.succeeded")
 

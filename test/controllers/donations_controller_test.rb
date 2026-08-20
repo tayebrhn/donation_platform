@@ -33,6 +33,14 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "does not create a donation for a missing project" do
+    assert_no_difference("Donation.count") do
+      post project_donations_url(project_id: 0), params: valid_donation_params
+    end
+
+    assert_response :not_found
+  end
+
   test "creates a pending donation and Stripe PaymentIntent" do
     payment_intents = Minitest::Mock.new
     payment_intent = stripe_payment_intent(id: "pi_new_donation", donation_id: nil)
@@ -131,6 +139,26 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :bad_gateway
     assert_select ".form-errors", text: /Payment setup is temporarily unavailable/
+  end
+
+  test "rolls back the pending donation when Stripe returns a mismatched PaymentIntent" do
+    payment_intents = Minitest::Mock.new
+    payment_intents.expect(:create, stripe_payment_intent(id: "pi_mismatched", donation_id: "wrong", amount: 2_500)) do |params, options|
+      donation = Donation.find_by!(donor_email: "donor@example.com")
+      assert_equal 2_500, params[:amount]
+      assert_equal({ idempotency_key: "donation-#{donation.id}" }, options)
+      true
+    end
+
+    assert_no_difference("Donation.count") do
+      with_stripe_payment_intents(payment_intents) do
+        post project_donations_url(@project), params: valid_donation_params
+      end
+    end
+
+    assert_response :bad_gateway
+    assert_select ".form-errors", text: /Payment setup is temporarily unavailable/
+    payment_intents.verify
   end
 
   test "does not create a donation without Stripe configuration" do
@@ -238,6 +266,29 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     payment_intents.verify
   end
 
+  test "handles missing publishable key during checkout" do
+    donation = donations(:library_pending)
+    Rails.configuration.x.stripe.publishable_key = nil
+    payment_intents = Minitest::Mock.new
+    payment_intents.expect(
+      :retrieve,
+      stripe_payment_intent(
+        id: donation.stripe_payment_intent_id,
+        donation_id: donation.id,
+        amount: donation.amount_cents
+      ),
+      [ donation.stripe_payment_intent_id ]
+    )
+
+    with_stripe_payment_intents(payment_intents) do
+      get checkout_donation_url(donation.signed_id(purpose: :checkout, expires_in: 30.minutes))
+    end
+
+    assert_redirected_to project_path(@project)
+    assert_equal "Secure checkout is temporarily unavailable. Please try again.", flash[:alert]
+    payment_intents.verify
+  end
+
   test "checkout and result reject unsigned donation IDs" do
     get checkout_donation_url(donations(:library_pending).id)
     assert_response :not_found
@@ -265,6 +316,17 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Your donation was not charged."
     assert_equal "failed", donation.reload.status
+  end
+
+  test "result displays a donation already confirmed by the webhook" do
+    donation = donations(:library_first)
+
+    get result_donation_url(donation.signed_id(purpose: :result, expires_in: 2.days))
+
+    assert_response :success
+    assert_select "h1", text: "Thank you for helping this project move forward."
+    assert_select "body", text: /Stripe has confirmed your \$2,500 donation/
+    assert_equal "succeeded", donation.reload.status
   end
 
   private
