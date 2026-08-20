@@ -1,9 +1,18 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+[
+  {
+    title: "Build a School Library",
+    description: "Help provide books and a safe reading space for local students.",
+    goal_amount_cents: 1_000_000,
+    currency: "USD",
+    status: "active"
+  },
+  {
+    title: "Create a Community Garden",
+    description: "Turn an unused schoolyard into a garden and outdoor classroom.",
+    goal_amount_cents: 500_000,
+    currency: "USD",
+    status: "draft"
+  }
+].each do |attributes|
+  Project.find_or_initialize_by(title: attributes[:title]).update!(attributes)
+end
