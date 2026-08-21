@@ -46,6 +46,14 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 4, projects(:school_library).donations.size
   end
 
+  test "requires an assigned project manager to have a management role" do
+    project = projects(:school_library)
+    project.project_manager = users(:donor)
+
+    assert_predicate project, :invalid?
+    assert_includes project.errors[:project_manager], "must have a management role"
+  end
+
   test "amount raised includes only succeeded donations" do
     assert_equal 425_000, projects(:school_library).amount_raised
   end

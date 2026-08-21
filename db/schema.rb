@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_21_000001) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_21_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -24,8 +24,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000001) do
     t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["project_id"], name: "index_donations_on_project_id"
     t.index ["stripe_payment_intent_id"], name: "index_donations_on_stripe_payment_intent_id", unique: true, where: "(stripe_payment_intent_id IS NOT NULL)"
+    t.index ["user_id"], name: "index_donations_on_user_id"
     t.check_constraint "amount_cents >= 100 AND amount_cents <= 1000000", name: "donations_amount_allowed"
     t.check_constraint "currency::text ~ '^[A-Z]{3}$'::text", name: "donations_currency_format"
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'succeeded'::character varying::text, 'failed'::character varying::text])", name: "donations_status_allowed"
@@ -39,6 +41,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000001) do
     t.string "status", default: "draft", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "project_manager_id"
+    t.index ["project_manager_id"], name: "index_projects_on_project_manager_id"
     t.index ["status"], name: "index_projects_on_status"
     t.check_constraint "currency::text ~ '^[A-Z]{3}$'::text", name: "projects_currency_format"
     t.check_constraint "goal_amount_cents > 0", name: "projects_goal_amount_positive"
@@ -61,10 +65,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000001) do
     t.string "role", default: "donor", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
     t.index "lower((email)::text)", name: "index_users_on_lower_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.check_constraint "role::text = ANY (ARRAY['donor'::character varying, 'project_manager'::character varying, 'admin'::character varying]::text[])", name: "users_role_allowed"
   end
 
   add_foreign_key "donations", "projects"
+  add_foreign_key "donations", "users"
+  add_foreign_key "projects", "users", column: "project_manager_id"
 end

@@ -27,6 +27,16 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[type='submit']:not([disabled])", text: /Continue to payment/
   end
 
+  test "prefills donor details for a signed-in donor" do
+    sign_in users(:donor)
+
+    get new_project_donation_url(@project)
+
+    assert_response :success
+    assert_select "input[name='donation[donor_name]'][value='Dana Brooks']"
+    assert_select "input[name='donation[donor_email]'][value='dana@example.com']"
+  end
+
   test "does not render a donation form for a draft project" do
     get new_project_donation_url(projects(:community_garden))
 
@@ -42,6 +52,7 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "creates a pending donation and Stripe PaymentIntent" do
+    sign_in users(:donor)
     payment_intents = Minitest::Mock.new
     payment_intent = stripe_payment_intent(id: "pi_new_donation", donation_id: nil)
     payment_intents.expect(:create, payment_intent) do |params, options|
@@ -73,6 +84,7 @@ class DonationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "USD", donation.currency
     assert_equal 2_550, donation.amount_cents
     assert_equal "pi_new_donation", donation.stripe_payment_intent_id
+    assert_equal users(:donor), donation.user
     payment_intents.verify
   end
 

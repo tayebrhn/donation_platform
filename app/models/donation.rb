@@ -4,6 +4,7 @@ class Donation < ApplicationRecord
   MAXIMUM_AMOUNT_CENTS = 1_000_000
 
   belongs_to :project
+  belongs_to :user, optional: true
 
   scope :succeeded, -> { where(status: "succeeded") }
 

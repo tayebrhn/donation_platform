@@ -61,11 +61,15 @@ class DonationsController < ApplicationController
 
   def build_donation
     @amount = donation_params[:amount]
+    donor_details = donation_params.slice(:donor_name, :donor_email)
+    donor_details[:donor_name] ||= current_user&.name
+    donor_details[:donor_email] ||= current_user&.email
     @donation = @project.donations.build(
-      donation_params.slice(:donor_name, :donor_email).merge(
+      donor_details.merge(
         amount_cents: amount_in_cents(@amount),
         currency: @project.currency,
-        status: "pending"
+        status: "pending",
+        user: current_user
       )
     )
   end
