@@ -1,0 +1,9 @@
+<% content_for :title, "Change user role | Common Ground" %>
+<main id="main-content" class="site-shell account-page"><section class="account-panel">
+  <div class="eyebrow eyebrow--quiet">Administration</div><h1>Change user role.</h1><p><strong><%= @user.name %></strong><br><%= @user.email %></p>
+  <% if @user.errors.any? %><div class="form-errors" role="alert"><ul><% @user.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
+  <%= form_with model: [ :admin, @user ], class: "account-form" do |form| %>
+    <div class="form-field"><%= form.label :role %><%= form.select :role, User::ROLES.map { |role| [ role.humanize, role ] } %></div>
+    <%= form.submit "Update role", class: "button button--primary button--full" %>
+  <% end %>
+</section></main>

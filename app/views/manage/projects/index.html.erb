@@ -1,0 +1,23 @@
+<% content_for :title, "Manage projects | Common Ground" %>
+
+<main id="main-content" class="site-shell workspace-page">
+  <header class="workspace-header">
+    <div><div class="eyebrow eyebrow--quiet">Campaign workspace</div><h1>Manage projects.</h1><p>Draft, publish, and track fundraising campaigns.</p></div>
+    <%= link_to "New project", new_manage_project_path, class: "button button--primary" %>
+  </header>
+  <section class="workspace-section">
+    <% if @projects.any? %>
+      <div class="data-list">
+        <% @projects.each do |project| %>
+          <article class="data-row">
+            <div><strong><%= link_to project.title, manage_project_path(project) %></strong><span><%= format_money(project.amount_raised, currency: project.currency) %> raised</span></div>
+            <span class="role-badge"><%= project.status.humanize %></span>
+            <%= link_to "Edit", edit_manage_project_path(project), class: "text-link" %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state"><h3>No managed projects.</h3><p>Create a draft to begin.</p></div>
+    <% end %>
+  </section>
+</main>

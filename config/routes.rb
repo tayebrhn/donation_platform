@@ -1,6 +1,18 @@
 Rails.application.routes.draw do
   root "projects#index"
 
+  devise_for :users, path: "account", controllers: { registrations: "users/registrations" }
+
+  resource :profile, only: [ :show, :edit, :update ], controller: "profiles"
+
+  namespace :manage do
+    resources :projects
+  end
+
+  namespace :admin do
+    resources :users, only: [ :index, :edit, :update ]
+  end
+
   resources :projects, only: [ :index, :show ] do
     resources :donations, only: [ :new, :create ]
   end

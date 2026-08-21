@@ -42,6 +42,25 @@ Load the demo campaigns:
 bin\rails db:seed
 ```
 
+To bootstrap the first administrator, set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and optionally `ADMIN_NAME` before running the seed command. The password is used only when creating a new administrator:
+
+```powershell
+$env:ADMIN_NAME = "Platform Administrator"
+$env:ADMIN_EMAIL = "admin@example.com"
+$env:ADMIN_PASSWORD = "use-a-unique-secure-password"
+bin\rails db:seed
+```
+
+New public registrations always receive the `donor` role. Administrators can promote users to `project_manager` or `admin` from the Users screen.
+
+## User Roles
+
+- `donor`: manage a profile, view donations made while signed in, and continue to use the public donation flow.
+- `project_manager`: use the campaign workspace to create projects and manage only assigned projects.
+- `admin`: manage every project, assign project managers, and change other users' roles.
+
+Public registration cannot request a privileged role. An administrator cannot demote their own account through the UI, reducing the risk of accidental administrative lockout. Guest donations remain supported and are not retroactively linked to accounts by email address.
+
 Start Rails:
 
 ```powershell

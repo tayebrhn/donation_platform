@@ -29,7 +29,19 @@
 
         <nav class="site-nav" aria-label="Primary navigation">
           <%= link_to "Projects", projects_path, class: "site-nav__link" %>
-          <span class="site-nav__note">Local giving, made visible</span>
+          <% if user_signed_in? %>
+            <% if current_user.project_manager? || current_user.admin? %>
+              <%= link_to "Manage projects", manage_projects_path, class: "site-nav__link" %>
+            <% end %>
+            <% if current_user.admin? %>
+              <%= link_to "Users", admin_users_path, class: "site-nav__link" %>
+            <% end %>
+            <%= link_to current_user.name, profile_path, class: "site-nav__link" %>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "site-nav__button" %>
+          <% else %>
+            <%= link_to "Sign in", new_user_session_path, class: "site-nav__link" %>
+            <%= link_to "Create account", new_user_registration_path, class: "site-nav__link site-nav__link--strong" %>
+          <% end %>
         </nav>
       </div>
     </header>

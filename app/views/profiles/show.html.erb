@@ -1,0 +1,35 @@
+<% content_for :title, "Your profile | Common Ground" %>
+
+<main id="main-content" class="site-shell workspace-page">
+  <header class="workspace-header">
+    <div>
+      <div class="eyebrow eyebrow--quiet"><%= current_user.role.humanize %></div>
+      <h1><%= current_user.name %></h1>
+      <p><%= current_user.email %></p>
+    </div>
+    <div class="workspace-actions">
+      <%= link_to "Edit profile", edit_profile_path, class: "button button--secondary" %>
+      <%= link_to "Account security", edit_user_registration_path, class: "button button--primary" %>
+    </div>
+  </header>
+
+  <section class="workspace-section" aria-labelledby="donations-title">
+    <div class="section-heading">
+      <div><div class="eyebrow eyebrow--quiet">Account activity</div><h2 id="donations-title">Your donations</h2></div>
+      <span class="section-heading__count"><%= @donations.size %> recorded</span>
+    </div>
+    <% if @donations.any? %>
+      <div class="data-list">
+        <% @donations.each do |donation| %>
+          <article class="data-row">
+            <div><strong><%= donation.project.title %></strong><span><%= donation.created_at.to_date.to_fs(:long) %></span></div>
+            <span class="role-badge role-badge--<%= donation.status %>"><%= donation.status.humanize %></span>
+            <strong><%= format_money(donation.amount_cents, currency: donation.currency) %></strong>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state"><h3>No donations yet.</h3><p>Your signed-in donations will appear here.</p></div>
+    <% end %>
+  </section>
+</main>

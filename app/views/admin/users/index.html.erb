@@ -1,0 +1,9 @@
+<% content_for :title, "Manage users | Common Ground" %>
+<main id="main-content" class="site-shell workspace-page">
+  <header class="workspace-header"><div><div class="eyebrow eyebrow--quiet">Administration</div><h1>Users and roles.</h1><p>Control access to campaign and administrative tools.</p></div></header>
+  <section class="workspace-section"><div class="data-list">
+    <% @users.each do |user| %>
+      <article class="data-row"><div><strong><%= user.name %></strong><span><%= user.email %></span></div><span class="role-badge"><%= user.role.humanize %></span><%= link_to "Change role", edit_admin_user_path(user), class: "text-link" %></article>
+    <% end %>
+  </div></section>
+</main>

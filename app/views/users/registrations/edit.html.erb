@@ -1,0 +1,21 @@
+<% content_for :title, "Account security | Common Ground" %>
+
+<main id="main-content" class="site-shell account-page">
+  <section class="account-panel" aria-labelledby="account-title">
+    <div class="eyebrow eyebrow--quiet">Account security</div>
+    <h1 id="account-title">Change your password.</h1>
+    <%= render "users/shared/error_messages", resource: resource %>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "account-form" }) do |form| %>
+      <div class="form-field"><%= form.label :name %><%= form.text_field :name, autocomplete: "name", required: true %></div>
+      <div class="form-field"><%= form.label :email %><%= form.email_field :email, autocomplete: "email", required: true %></div>
+      <div class="form-field"><%= form.label :password, "New password" %><%= form.password_field :password, autocomplete: "new-password" %><span class="form-hint">Leave blank to keep your current password.</span></div>
+      <div class="form-field"><%= form.label :password_confirmation, "Confirm new password" %><%= form.password_field :password_confirmation, autocomplete: "new-password" %></div>
+      <div class="form-field"><%= form.label :current_password %><%= form.password_field :current_password, autocomplete: "current-password", required: true %><span class="form-hint">Required to save security changes.</span></div>
+      <%= form.submit "Update account", class: "button button--primary button--full" %>
+    <% end %>
+
+    <%= link_to "Return to profile", profile_path %>
+    <div class="account-danger"><strong>Close account</strong><p>This removes your login. Donation records remain for payment and accounting integrity.</p><%= button_to "Delete my account", registration_path(resource_name), method: :delete, class: "danger-link", form: { data: { turbo_confirm: "Delete your account?" } } %></div>
+  </section>
+</main>

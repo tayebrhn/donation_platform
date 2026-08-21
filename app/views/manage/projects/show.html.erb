@@ -1,0 +1,6 @@
+<% content_for :title, "#{@project.title} | Manage" %>
+<main id="main-content" class="site-shell workspace-page">
+  <header class="workspace-header"><div><div class="eyebrow eyebrow--quiet"><%= @project.status.humanize %></div><h1><%= @project.title %></h1><p><%= @project.description %></p></div><div class="workspace-actions"><%= link_to "Edit", edit_manage_project_path(@project), class: "button button--secondary" %><%= link_to "Public page", project_path(@project), class: "button button--primary" if @project.status == "active" %></div></header>
+  <section class="metric-grid"><div><span>Raised</span><strong><%= format_money(@project.amount_raised, currency: @project.currency) %></strong></div><div><span>Goal</span><strong><%= format_money(@project.goal_amount_cents, currency: @project.currency) %></strong></div><div><span>Progress</span><strong><%= @project.progress_percentage %>%</strong></div></section>
+  <section class="workspace-section"><%= button_to "Delete project", manage_project_path(@project), method: :delete, class: "danger-link", form: { data: { turbo_confirm: "Delete this project?" } } %></section>
+</main>

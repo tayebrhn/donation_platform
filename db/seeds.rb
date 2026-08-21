@@ -16,3 +16,10 @@
 ].each do |attributes|
   Project.find_or_initialize_by(title: attributes[:title]).update!(attributes)
 end
+
+if ENV["ADMIN_EMAIL"].present? && ENV["ADMIN_PASSWORD"].present?
+  admin = User.find_or_initialize_by(email: ENV["ADMIN_EMAIL"].downcase)
+  admin.assign_attributes(name: ENV.fetch("ADMIN_NAME", "Platform Administrator"), role: "admin")
+  admin.password = ENV["ADMIN_PASSWORD"] if admin.new_record?
+  admin.save!
+end

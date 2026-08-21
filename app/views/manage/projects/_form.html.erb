@@ -1,0 +1,16 @@
+<% if project.errors.any? %>
+  <div class="form-errors" role="alert"><ul><% project.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div>
+<% end %>
+<%= form_with model: [ :manage, project ], class: "account-form" do |form| %>
+  <div class="form-field"><%= form.label :title %><%= form.text_field :title, required: true %></div>
+  <div class="form-field"><%= form.label :description %><%= form.text_area :description, required: true, rows: 6 %></div>
+  <div class="form-grid">
+    <div class="form-field"><%= form.label :goal_amount_cents, "Goal amount (cents)" %><%= form.number_field :goal_amount_cents, min: 1, required: true %></div>
+    <div class="form-field"><%= form.label :currency %><%= form.text_field :currency, maxlength: 3, required: true %></div>
+  </div>
+  <div class="form-field"><%= form.label :status %><%= form.select :status, Project::STATUSES.map { |status| [ status.humanize, status ] } %></div>
+  <% if current_user.admin? %>
+    <div class="form-field"><%= form.label :project_manager_id, "Project manager" %><%= form.collection_select :project_manager_id, @project_managers, :id, :name, prompt: "Select a manager" %></div>
+  <% end %>
+  <%= form.submit class: "button button--primary" %>
+<% end %>

@@ -1,0 +1,20 @@
+<% content_for :title, "Choose password | Common Ground" %>
+
+<main id="main-content" class="site-shell account-page">
+  <section class="account-panel" aria-labelledby="password-title">
+    <h1 id="password-title">Choose a new password.</h1>
+    <%= render "users/shared/error_messages", resource: resource %>
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "account-form" }) do |form| %>
+      <%= form.hidden_field :reset_password_token %>
+      <div class="form-field">
+        <%= form.label :password, "New password" %>
+        <%= form.password_field :password, autofocus: true, autocomplete: "new-password", required: true %>
+      </div>
+      <div class="form-field">
+        <%= form.label :password_confirmation, "Confirm new password" %>
+        <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true %>
+      </div>
+      <%= form.submit "Change password", class: "button button--primary button--full" %>
+    <% end %>
+  </section>
+</main>

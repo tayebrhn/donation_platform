@@ -1,0 +1,32 @@
+<% content_for :title, "Create account | Common Ground" %>
+
+<main id="main-content" class="site-shell account-page">
+  <section class="account-panel" aria-labelledby="registration-title">
+    <div class="eyebrow eyebrow--quiet">Donor account</div>
+    <h1 id="registration-title">Keep your giving history together.</h1>
+    <%= render "users/shared/error_messages", resource: resource %>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "account-form" }) do |form| %>
+      <div class="form-field">
+        <%= form.label :name %>
+        <%= form.text_field :name, autofocus: true, autocomplete: "name", required: true %>
+      </div>
+      <div class="form-field">
+        <%= form.label :email %>
+        <%= form.email_field :email, autocomplete: "email", required: true %>
+      </div>
+      <div class="form-field">
+        <%= form.label :password %>
+        <%= form.password_field :password, autocomplete: "new-password", required: true, minlength: @minimum_password_length %>
+        <% if @minimum_password_length %><span class="form-hint"><%= @minimum_password_length %> characters minimum</span><% end %>
+      </div>
+      <div class="form-field">
+        <%= form.label :password_confirmation %>
+        <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true %>
+      </div>
+      <%= form.submit "Create donor account", class: "button button--primary button--full" %>
+    <% end %>
+
+    <%= render "users/shared/links" %>
+  </section>
+</main>
