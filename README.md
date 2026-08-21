@@ -4,7 +4,7 @@ Common Ground is a small Rails 7 donation platform for school and community fund
 
 ## Requirements
 
-- Windows 11 with Ruby 3.3.x
+- Ruby 3.3.x
 - Rails 7.1.x and Bundler
 - PostgreSQL 14 or newer, running locally
 - A Stripe test-mode account
