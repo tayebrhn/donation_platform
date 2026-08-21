@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_14_000003) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_21_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_14_000003) do
     t.datetime "updated_at", null: false
     t.index ["event_type"], name: "index_stripe_webhook_events_on_event_type"
     t.index ["stripe_event_id"], name: "index_stripe_webhook_events_on_stripe_event_id", unique: true
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "role", default: "donor", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "index_users_on_lower_email", unique: true
+    t.index ["role"], name: "index_users_on_role"
+    t.check_constraint "role::text = ANY (ARRAY['donor'::character varying, 'project_manager'::character varying, 'admin'::character varying]::text[])", name: "users_role_allowed"
   end
 
   add_foreign_key "donations", "projects"

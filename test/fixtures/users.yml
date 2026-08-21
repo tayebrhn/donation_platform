@@ -1,0 +1,14 @@
+donor:
+  name: Dana Brooks
+  email: dana@example.com
+  role: donor
+
+project_manager:
+  name: Morgan Ellis
+  email: morgan.manager@example.com
+  role: project_manager
+
+admin:
+  name: Avery Chen
+  email: avery.admin@example.com
+  role: admin
