@@ -1,94 +1,261 @@
-# Rails 7 Donation Platform — AI Agent Implementation Prompt
+# AGENTS.md
 
-You are an experienced Ruby on Rails 7 engineer. Build a small, production-quality **Donation Platform** for a school or charity project.
+## Project: Donation Platform
 
-## 1. Project Goal
+Build a small donation platform using **Ruby on Rails 7**. The application allows users to donate small amounts to school or charity projects using Stripe test payments and displays fundraising progress.
 
-Create a web application where:
+---
 
-* A project/organization can define a fundraising goal.
-* Visitors can view the project and its fundraising progress.
-* Visitors can make small donations.
-* Donations are processed through **Stripe in test mode**.
-* The project page displays a progress bar showing:
+# 1. Development Environment
 
-  * Current amount raised.
-  * Fundraising goal.
-  * Percentage completed.
-* Donors do not need to create an account.
+The project runs **natively on Windows**.
 
-Keep the MVP simple. Do not implement unnecessary features such as subscriptions, complex user roles, social login, or an admin dashboard unless they are required for the core functionality.
+Do **NOT** introduce WSL, Docker, containers, or a Linux-specific development workflow unless explicitly requested.
 
-## 2. Technology Stack
-
-Use:
-
-* Ruby on Rails 7
-* Ruby 3.x
-* PostgreSQL
-* Stripe API / Stripe Ruby SDK
-* Hotwire/Turbo where useful
-* ERB views
-* Importmap or the default Rails 7 JavaScript setup
-* Bootstrap or simple custom CSS for styling
-* Rails credentials or environment variables for Stripe secrets
-* RSpec or Rails/Minitest for testing
-
-Prefer standard Rails conventions over unnecessary abstractions.
-
-## 3. Core Domain Model
-
-Create a `Project` model.
-
-Suggested fields:
+### Environment
 
 ```text
-Project
-- title
-- description
-- goal_amount_cents
-- currency
-- status
-- created_at
-- updated_at
+Operating System: Windows 11
+Architecture: x64
+Ruby: 3.3.x
+Rails: 7.1.x
+Database: PostgreSQL
+Frontend: Rails ERB + Hotwire/Turbo
+Payments: Stripe Test Mode
+Version Control: Git
+AI Agent: OpenCode
+Editor: VS Code
 ```
 
-Create a `Donation` model.
+### Important
 
-Suggested fields:
+Use native Windows commands and paths when necessary.
+
+Prefer Rails' standard commands:
 
 ```text
-Donation
-- project_id
-- donor_name
-- donor_email
-- amount_cents
-- currency
-- stripe_payment_intent_id
-- status
-- created_at
-- updated_at
+rails
+rails server
+rails test
+rails db:migrate
+rails db:seed
 ```
 
-Use integer cents for monetary values rather than floating-point numbers.
+The project should remain compatible with a normal native Windows Rails development environment.
+
+---
+
+# 2. Existing Environment
+
+Before changing anything, inspect the existing project.
+
+Check:
+
+```powershell
+ruby --version
+rails --version
+bundle --version
+psql --version
+git --version
+```
+
+Also inspect:
+
+```powershell
+git status
+git log --oneline -n 10
+```
+
+Do not reinstall or replace tools that are already correctly configured.
+
+Do not upgrade Ruby, Rails, PostgreSQL, or other major dependencies without a concrete reason.
+
+---
+
+# 3. Database
+
+Use **PostgreSQL**.
+
+Do not replace PostgreSQL with SQLite.
+
+Use Rails' PostgreSQL adapter and standard Active Record migrations.
+
+The database should use:
+
+```text
+development
+test
+```
+
+environments appropriately.
+
+Use integer cents for monetary amounts.
 
 Example:
 
 ```text
-$10.50 → 1050 cents
+$10.50 = 1050 cents
 ```
 
-Add appropriate validations and database indexes.
+Never use floating-point values for financial calculations.
 
-Possible donation statuses:
+---
+
+# 4. Stripe
+
+Use **Stripe Test Mode only**.
+
+Never use real payment credentials or real transactions during development.
+
+Expected environment variables:
 
 ```text
-pending
-succeeded
-failed
+STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
 ```
 
-Project statuses can be:
+Never commit actual Stripe secrets.
+
+Use `.env.example` to document required variables if the project uses `.env`.
+
+The Stripe webhook must verify its signature.
+
+Never trust payment success based solely on browser/client-side behavior.
+
+---
+
+# 5. Git
+
+Git is already part of the development workflow.
+
+Maintain a clean and meaningful Git history.
+
+Do not make one giant commit containing the entire application.
+
+Make **incremental, focused commits** after each stable milestone.
+
+Before every commit:
+
+```powershell
+git status
+git diff
+```
+
+Run the relevant tests/checks.
+
+Then stage only the files belonging to that change:
+
+```powershell
+git add <specific-files>
+```
+
+Create a descriptive commit:
+
+```powershell
+git commit -m "feat: add donation model"
+```
+
+After committing:
+
+```powershell
+git status
+git log -1 --oneline
+```
+
+Do not squash or rewrite previous commits unless explicitly instructed.
+
+Avoid meaningless commit messages such as:
+
+```text
+update
+changes
+fix
+stuff
+final
+wip
+```
+
+Prefer conventional commit messages:
+
+```text
+chore: initialize Rails application
+feat: add project model
+feat: add donation model
+feat: add fundraising progress calculation
+feat: add project pages
+feat: add donation form
+feat: integrate Stripe PaymentIntent
+feat: add Stripe webhook handling
+test: add donation payment tests
+fix: prevent duplicate webhook processing
+style: improve donation platform UI
+docs: document Stripe setup
+```
+
+---
+
+# 6. Development Principles
+
+Follow standard Rails conventions.
+
+Prefer:
+
+* MVC architecture
+* Active Record
+* RESTful routes
+* Rails validations
+* Rails associations
+* Rails migrations
+* ERB views
+* Hotwire/Turbo where useful
+* Server-side validation
+* Small focused methods
+* Clear naming
+* Database constraints
+
+Avoid unnecessary architecture.
+
+Do not introduce:
+
+* React
+* Vue
+* Angular
+* Docker
+* WSL
+* Kubernetes
+* microservices
+* repositories
+* excessive service objects
+* unnecessary APIs
+
+unless there is a concrete requirement.
+
+This is intended to be a **small Rails application**, not an over-engineered system.
+
+---
+
+# 7. Project Requirements
+
+The application must provide:
+
+## Projects
+
+A project represents a school or charity fundraising campaign.
+
+Fields:
+
+```text
+title
+description
+goal_amount_cents
+currency
+status
+created_at
+updated_at
+```
+
+Possible statuses:
 
 ```text
 draft
@@ -96,644 +263,391 @@ active
 completed
 ```
 
-## 4. Database Requirements
+## Donations
 
-Create Rails migrations for the models.
+Fields:
 
-Add:
+```text
+project_id
+donor_name
+donor_email
+amount_cents
+currency
+stripe_payment_intent_id
+status
+created_at
+updated_at
+```
 
-* Foreign key from donations to projects.
-* Index on `donations.project_id`.
-* Unique index on `donations.stripe_payment_intent_id` where appropriate.
-* Appropriate `NOT NULL` constraints.
-* Reasonable default values.
+Possible statuses:
 
-Use Rails associations:
+```text
+pending
+succeeded
+failed
+```
+
+Associations:
 
 ```ruby
 Project has_many :donations
 Donation belongs_to :project
 ```
 
-Add model methods such as:
+---
 
-```ruby
-Project#amount_raised
-Project#progress_percentage
-Project#remaining_amount
-```
+# 8. Fundraising Progress
 
-The progress percentage must never exceed 100%.
-
-For example:
+Projects must provide calculations for:
 
 ```text
-Goal: $10,000
+amount_raised
+remaining_amount
+progress_percentage
+```
+
+Example:
+
+```text
+Goal:   $10,000
 Raised: $4,250
 
 Progress: 42.5%
 ```
 
-If donations exceed the goal, display 100% rather than something greater than 100%.
-
-## 5. Public Pages
-
-Implement:
+Progress must never exceed:
 
 ```text
-GET /
-GET /projects/:id
-GET /projects/:project_id/donations/new
-POST /projects/:project_id/donations
-GET /donations/:id/success
-GET /donations/:id/cancel
+100%
 ```
 
-The home page should show active fundraising projects.
+If donations exceed the goal, display 100%.
 
-The project page should display:
+---
 
-* Project title
-* Description
-* Goal
-* Amount raised
-* Remaining amount
-* Progress percentage
-* Visual progress bar
-* Donation button
+# 9. Public Application Flow
 
-Example:
+The application should support:
 
 ```text
-Help Build a New School Library
-
-$4,250 raised of $10,000
-
-[████████████░░░░░░░░] 42.5%
-
-$5,750 remaining
-
-[ Donate Now ]
-```
-
-## 6. Donation Flow
-
-Implement the following flow:
-
-```text
-Project Page
-     ↓
+Home
+  ↓
+Projects
+  ↓
+Project Details
+  ↓
 Donate
-     ↓
+  ↓
 Donation Form
-     ↓
-Enter name, email and amount
-     ↓
-Create pending Donation
-     ↓
-Create Stripe PaymentIntent
-     ↓
-Stripe payment
-     ↓
-Payment succeeds
-     ↓
-Mark Donation as succeeded
-     ↓
-Show success page
+  ↓
+Stripe Payment
+  ↓
+Payment Result
 ```
 
-Do not mark a donation as successful merely because the user reaches the success page.
-
-The application's donation status must be based on the Stripe payment result/webhook.
-
-## 7. Stripe Integration
-
-Use Stripe's test environment.
-
-Store credentials using environment variables or Rails credentials.
-
-Example configuration:
+A project page should show:
 
 ```text
-STRIPE_PUBLISHABLE_KEY
-STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET
+Project title
+Description
+Amount raised
+Fundraising goal
+Remaining amount
+Progress percentage
+Progress bar
+Donate button
 ```
 
-Never hard-code Stripe secret keys.
+---
 
-Implement Stripe PaymentIntent creation.
+# 10. Stripe Payment Flow
 
-The amount sent to Stripe must come from the server-side validated donation amount.
+Use Stripe PaymentIntents.
 
-Never trust a client-provided amount when creating a Stripe payment.
+The server must:
 
-Use Stripe test cards for development.
+1. Validate the donation.
+2. Create a pending Donation.
+3. Create a Stripe PaymentIntent.
+4. Associate the PaymentIntent with the Donation.
+5. Allow Stripe to process the payment.
+6. Process Stripe's webhook.
+7. Mark the Donation as succeeded or failed.
 
-Do not use real payments.
+Do not mark a donation as successful merely because the user reaches a success page.
 
-## 8. Stripe Webhook
+Stripe's server-side confirmation/webhook flow is authoritative.
 
-Implement a webhook endpoint such as:
+---
+
+# 11. Webhooks
+
+Create:
 
 ```text
 POST /webhooks/stripe
 ```
 
-Handle at least:
+Handle at minimum:
 
 ```text
 payment_intent.succeeded
 payment_intent.payment_failed
 ```
 
-Verify the Stripe webhook signature.
+Verify Stripe webhook signatures.
 
-Do not blindly trust webhook request data.
+Webhook processing must be idempotent.
 
-When:
+A webhook may be delivered more than once. Duplicate events must not create duplicate successful donations or otherwise corrupt application state.
 
-```text
-payment_intent.succeeded
-```
+---
 
-is received:
+# 12. Security
 
-* Find the corresponding Donation.
-* Verify the PaymentIntent ID.
-* Mark the donation as `succeeded`.
-* Prevent duplicate processing.
+Always validate important values server-side.
 
-The webhook handling must be idempotent.
-
-## 9. Security
-
-Follow Rails security best practices.
-
-Implement:
-
-* Strong parameters.
-* CSRF protection where appropriate.
-* Server-side donation amount validation.
-* Email validation.
-* Minimum donation amount.
-* Maximum donation amount.
-* Stripe webhook signature verification.
-* No exposure of secret Stripe keys.
-* Protection against duplicate payment records.
-* Proper authorization of project/donation relationships.
-
-Do not allow users to modify:
+Never trust client-provided:
 
 ```text
-amount_cents
+amount
 project_id
-status
-stripe_payment_intent_id
+donation status
+Stripe payment status
+Stripe PaymentIntent ID
 ```
 
-through unsafe parameters after the payment process begins.
+Use:
 
-## 10. Donation Amount Validation
+* Strong parameters
+* Rails CSRF protection
+* Model validations
+* Database constraints
+* Stripe webhook signature verification
+* Secure secret management
 
-For the MVP, enforce reasonable limits.
+Never store raw credit-card information.
 
-For example:
+---
 
-```text
-minimum: $1
-maximum: $10,000
-```
+# 13. Testing
 
-The exact values should be configurable.
+Use the project's existing testing framework.
 
-Reject:
+If no framework has been selected, use Rails' default test framework unless there is a strong reason to introduce RSpec.
 
-* zero
-* negative values
-* invalid decimals
-* excessively large donations
-
-Convert the validated amount to cents on the server.
-
-## 11. UI
-
-Create a clean, responsive interface.
-
-Prioritize:
-
-* Simple navigation.
-* Project cards.
-* Project fundraising page.
-* Donation form.
-* Progress bar.
-* Stripe payment UI.
-* Success page.
-* Cancel/failure page.
-
-Do not over-engineer the frontend.
-
-Use Rails views and Hotwire where appropriate rather than creating a separate React application.
-
-## 12. Error Handling
-
-Handle:
-
-* Invalid donation amounts.
-* Invalid email addresses.
-* Stripe API errors.
-* Failed payments.
-* Cancelled payments.
-* Missing projects.
-* Missing donations.
-* Invalid Stripe webhook signatures.
-* Duplicate webhook events.
-
-Show useful user-facing error messages without exposing internal exceptions or Stripe secrets.
-
-Log useful server-side diagnostic information.
-
-## 13. Routes
-
-Use RESTful Rails routes where possible.
-
-Example:
-
-```ruby
-resources :projects, only: [:index, :show] do
-  resources :donations, only: [:new, :create]
-end
-
-resources :donations, only: [] do
-  member do
-    get :success
-    get :cancel
-  end
-end
-
-post "/webhooks/stripe", to: "webhooks/stripe#create"
-```
-
-Adjust the routing if a cleaner Rails convention is preferable.
-
-## 14. Testing
-
-Write tests for:
+Test:
 
 ### Models
 
-Test:
+* Valid projects
+* Invalid projects
+* Valid donations
+* Invalid donations
+* Associations
+* Amount calculations
+* Progress calculations
+* Progress capped at 100%
 
-* Project validations.
-* Donation validations.
-* Project/donation associations.
-* Amount calculations.
-* Progress calculation.
-* Progress never exceeding 100%.
+### Donation Flow
 
-### Controllers
+* Valid donation
+* Invalid amount
+* Invalid email
+* Missing project
+* Stripe API failure
+* Successful payment
+* Failed payment
 
-Test:
+### Webhooks
 
-* Project listing.
-* Project details.
-* Donation creation.
-* Invalid donation submission.
-* Missing project.
-* Success page.
-* Cancel page.
-* Webhook endpoint.
+* Valid Stripe signature
+* Invalid Stripe signature
+* Successful PaymentIntent
+* Failed PaymentIntent
+* Duplicate webhook/event processing
 
-### Stripe
+Mock Stripe API calls in automated tests.
 
-Mock Stripe API calls.
+Never make real Stripe API calls as part of the normal test suite.
 
-Do not make real Stripe API calls during the test suite.
+---
 
-Test:
+# 14. Implementation Phases
 
-* Successful PaymentIntent creation.
-* Stripe API failure.
-* Successful webhook.
-* Failed-payment webhook.
-* Invalid webhook signature.
-* Duplicate webhook event.
+Implement the project incrementally.
 
-## 15. Seed Data
+## Phase 1 — Project Setup
 
-Create useful development seed data.
+* Inspect existing Rails application.
+* Verify development environment.
+* Configure PostgreSQL.
+* Establish baseline tests.
+* Establish Git baseline.
 
-For example:
-
-```text
-Project:
-Title: Build a School Library
-Goal: $10,000
-Status: active
-```
-
-Create several example donations so the progress bar can be demonstrated.
-
-Make sure running:
-
-```bash
-bin/rails db:seed
-```
-
-creates usable demo data.
-
-## 16. README
-
-Create a complete README containing:
-
-* Project description.
-* Requirements.
-* Installation.
-* Database setup.
-* Environment variables.
-* Stripe test configuration.
-* How to run the Rails server.
-* How to run tests.
-* How to test Stripe webhooks locally.
-* Example Stripe test card.
-* Project structure.
-* Donation/payment flow.
-
-Example commands:
-
-```bash
-bundle install
-bin/rails db:create
-bin/rails db:migrate
-bin/rails db:seed
-bin/dev
-```
-
-If Stripe CLI is used, document the webhook forwarding command.
-
-## 17. Code Quality
-
-Follow Rails conventions.
-
-Prefer:
+Commit:
 
 ```text
-skinny controllers
-rich models/services where appropriate
-RESTful routes
-database constraints
-clear naming
-small methods
+chore: initialize Rails donation platform
 ```
 
-Do not introduce service objects, repositories, serializers, or additional architecture unless there is a concrete reason.
-
-Use RuboCop if appropriate.
-
-Avoid duplicated business logic.
-
-Keep monetary calculations deterministic and integer-based.
-
-## 18. Implementation Process
-
-Work incrementally.
-
-### Phase 1 — Rails Setup
-
-Create/configure the Rails 7 application and database.
-
-### Phase 2 — Models
+## Phase 2 — Database and Models
 
 Implement:
 
-```text
-Project
-Donation
-```
+* Project
+* Donation
+* Migrations
+* Associations
+* Validations
+* Fundraising calculations
 
-with migrations, associations, validations, and calculations.
+Commit separately.
 
-### Phase 3 — Public UI
+## Phase 3 — Public UI
 
 Implement:
 
-```text
-Projects#index
-Projects#show
-Donations#new
-```
+* Project listing
+* Project details
+* Progress bar
+* Donation form
 
-and the fundraising progress UI.
+Commit separately.
 
-### Phase 4 — Stripe
+## Phase 4 — Stripe Integration
 
-Implement PaymentIntent creation and the payment UI using Stripe test mode.
+Implement:
 
-### Phase 5 — Webhooks
+* Stripe configuration
+* PaymentIntent creation
+* Stripe payment UI
+* Pending donation handling
 
-Implement and verify Stripe webhooks.
+Commit separately.
 
-### Phase 6 — Error Handling
+## Phase 5 — Stripe Webhooks
 
-Handle payment failures, validation errors, missing records, and webhook failures.
+Implement:
 
-### Phase 7 — Tests
+* Webhook endpoint
+* Signature verification
+* Successful payments
+* Failed payments
+* Idempotency
 
-Add comprehensive automated tests.
+Commit separately.
 
-### Phase 8 — Documentation
+## Phase 6 — Error Handling
 
-Finish the README and setup instructions.
+Implement and test:
 
-## 19. Important Constraints
+* Validation errors
+* Stripe errors
+* Missing records
+* Failed payments
+* Cancelled payments
+* Invalid webhooks
 
-Do not:
+Commit separately.
 
-* Use real Stripe payments.
-* Store raw credit-card information.
-* Store Stripe secret keys in source control.
-* Trust payment status from the browser.
-* Trust donation amounts from the client.
-* Mark donations as successful without Stripe confirmation.
-* Build authentication unless necessary.
-* Build subscriptions.
-* Build recurring donations.
-* Build a complicated admin system.
-* Build a separate frontend application.
+## Phase 7 — Automated Tests
 
-The goal is a **small but properly engineered Rails 7 donation platform** demonstrating:
+Complete the test suite.
 
-* Rails MVC.
-* PostgreSQL.
-* Active Record.
-* RESTful routing.
-* Form handling.
-* Payment integration.
-* Stripe PaymentIntents.
-* Webhooks.
-* Secure server-side validation.
-* Testing.
-* Clean UI.
+Commit separately.
 
-## 20. Deliverables
+## Phase 8 — Documentation and Polish
 
-At the end, provide:
+Implement:
 
-1. Complete Rails application.
-2. Database migrations.
-3. Models.
-4. Controllers.
-5. Views.
-6. Stripe integration.
-7. Stripe webhook handling.
-8. Routes.
-9. Tests.
-10. Seed data.
-11. README.
-12. `.env.example` if environment variables are used.
-13. Any required Stripe setup instructions.
+* README
+* `.env.example`
+* Stripe local development instructions
+* UI improvements
+* Final cleanup
 
-Before finishing, run:
+Commit separately.
 
-```bash
-bin/rails db:migrate
-bin/rails db:seed
-bin/rails test
-```
+---
 
-or the appropriate RSpec command if RSpec is selected.
+# 15. Phase Gate
 
-Fix all errors found during implementation.
+**Do not automatically continue from one phase to the next.**
 
-Finally, provide a concise summary of:
+After completing a phase:
 
-* What was implemented.
-* Important architectural decisions.
-* How Stripe payments work.
-* How to run the application.
-* How to test a donation locally.
-* Any remaining limitations.
-## 21. Incremental Git Commits
+1. Run the relevant tests.
+2. Inspect the changes.
+3. Review `git diff`.
+4. Create the focused Git commit.
+5. Verify `git status`.
+6. Report what was completed.
+7. Stop.
 
-Use Git throughout the implementation. **Do not wait until the entire project is finished to make one large commit.**
+Wait for the user to explicitly request the next phase.
 
-Make small, logical commits after completing each stable milestone.
+Do not implement future phases while waiting.
 
-Use conventional, descriptive commit messages such as:
+---
+
+# 16. Agent Behavior
+
+Before modifying code:
 
 ```text
-chore: initialize Rails 7 application
-feat: add project and donation models
-feat: add fundraising progress calculation
-feat: add public project pages
-feat: add donation form
-feat: integrate Stripe PaymentIntents
-feat: add Stripe webhook handling
-feat: add donation success and failure flows
-test: add project and donation model tests
-test: add Stripe payment and webhook tests
-style: improve donation platform UI
-docs: add setup and Stripe testing instructions
+1. Inspect the repository.
+2. Inspect existing Git history.
+3. Inspect relevant Rails files.
+4. Understand the current implementation.
+5. Determine the smallest appropriate change.
 ```
 
-### Commit Rules
+Do not blindly overwrite existing code.
 
-Before each commit:
+When encountering an error:
 
-1. Check the current Git status:
+```text
+1. Read the complete error.
+2. Identify the root cause.
+3. Inspect relevant code/configuration.
+4. Make the smallest appropriate fix.
+5. Re-run the failing command/test.
+6. Verify that the fix did not break existing functionality.
+```
 
-```bash
+Do not hide errors by disabling tests, removing validations, or weakening security.
+
+If a requirement is ambiguous and the decision could materially affect architecture, security, payments, or data integrity, stop and ask for clarification rather than making a risky assumption.
+
+---
+
+# 17. Completion Requirements
+
+The application is complete only when:
+
+```text
+[ ] Rails application runs successfully
+[ ] PostgreSQL works
+[ ] Projects can be created/displayed
+[ ] Fundraising progress works
+[ ] Donations can be submitted
+[ ] Stripe Test Mode works
+[ ] PaymentIntent integration works
+[ ] Stripe webhook works
+[ ] Duplicate webhook handling works
+[ ] Failed payments are handled
+[ ] Automated tests pass
+[ ] No secrets are committed
+[ ] README is complete
+[ ] Git history contains meaningful incremental commits
+[ ] Working tree is clean
+```
+
+Before declaring the project complete, run the appropriate Rails test suite and verify:
+
+```powershell
 git status
 ```
 
-2. Review the changes:
-
-```bash
-git diff
-```
-
-3. Run the relevant tests.
-
-4. Make sure unrelated files or changes are not included.
-
-5. Stage only the intended files:
-
-```bash
-git add <specific-files>
-```
-
-6. Create a focused commit:
-
-```bash
-git commit -m "feat: add project and donation models"
-```
-
-7. Verify the commit:
-
-```bash
-git status
-git log -1 --oneline
-```
-
-### Commit Granularity
-
-Prefer commits representing a single coherent change.
-
-For example, do **not** create:
-
-```text
-feat: build entire donation platform
-```
-
-with dozens of unrelated changes.
-
-Instead, use a progression similar to:
-
-```text
-chore: initialize Rails 7 application
-feat: configure PostgreSQL database
-feat: add project and donation models
-feat: add project fundraising calculations
-feat: add project listing page
-feat: add project donation page
-feat: add donation creation flow
-feat: integrate Stripe PaymentIntents
-feat: add Stripe webhook processing
-test: add donation payment tests
-test: add Stripe webhook tests
-style: improve donation platform UI
-docs: document local Stripe setup
-```
-
-### Important
-
-Do not create meaningless commits such as:
-
-```text
-update
-changes
-fix stuff
-final
-misc
-wip
-```
-
-Keep commits independently understandable and preferably buildable/testable.
-
-If a bug is discovered during implementation, fix it in a separate focused commit when practical, for example:
-
-```text
-fix: prevent duplicate Stripe webhook processing
-fix: cap fundraising progress at 100 percent
-fix: validate donation amount server side
-```
-
-Do not rewrite, squash, or delete previous commits unless explicitly instructed.
-
-At the end, show the final commit history with:
-
-```bash
-git log --oneline --decorate -n 20
-```
-
-The implementation should therefore leave behind a clear Git history that demonstrates the project's development progression rather than a single large final commit.
+The final working tree should be clean unless there is an explicitly documented reason for uncommitted changes.
