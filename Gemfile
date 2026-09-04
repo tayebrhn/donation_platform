@@ -15,7 +15,7 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 # Process test payments with Stripe PaymentIntents
-gem "stripe", "~> 19.5"
+gem "stripe", "~> 19.6"
 # User registration, sessions, and password recovery
 gem "devise", "~> 4.9"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
